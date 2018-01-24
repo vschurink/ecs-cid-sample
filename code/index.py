@@ -41,7 +41,7 @@ def publishToSNS(message, topicARN):
 """Check task status on the ECS container instance ID.
     :param Ec2InstanceId: The EC2 instance ID is used to identify the cluster, container instances in cluster
 """
-def checkContainerInstanceTaskStatus(Ec2InstanceId):
+def checkContainerInstanceTaskStatus(Ec2InstanceId, clusterListResp):
     containerInstanceId = None
     clusterName = None
     tmpMsgAppend = None
@@ -109,7 +109,6 @@ def checkContainerInstanceTaskStatus(Ec2InstanceId):
 
 
 def lambda_handler(event, context):
-
     line = event['Records'][0]['Sns']['Message']
     message = json.loads(line)
     Ec2InstanceId = message['EC2InstanceId']
@@ -156,7 +155,7 @@ def lambda_handler(event, context):
             logger.debug("Setting lifecycle hook name %s ",lifecycleHookName)
 
             # Check if there are any tasks running on the instance
-            tasksRunning, tmpMsgAppend = checkContainerInstanceTaskStatus(Ec2InstanceId)
+            tasksRunning, tmpMsgAppend = checkContainerInstanceTaskStatus(Ec2InstanceId, clusterListResp)
             logger.debug("Returned values received: %s ",tasksRunning)
             if tmpMsgAppend != None:
                 message.update(tmpMsgAppend)
