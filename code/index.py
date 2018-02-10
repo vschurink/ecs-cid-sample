@@ -63,7 +63,7 @@ def checkContainerInstanceTaskStatus(Ec2InstanceId):
     paginator = ecsClient.get_paginator('list_container_instances')
     clusterListPages = paginator.paginate(cluster=clusterName)
     for containerListResp in clusterListPages:
-        containerDetResp = ecsClient.describe_container_instances(cluster=clusterName, containerInstances=clusterListResp[
+        containerDetResp = ecsClient.describe_container_instances(cluster=clusterName, containerInstances=containerListResp[
             'containerInstanceArns'])
         logger.debug("describe container instances response %s",containerDetResp)
 
@@ -141,10 +141,6 @@ def lambda_handler(event, context):
             # Split and get the cluster name
             clusterName = token.split('=')[1]
             logger.debug("Cluster name %s",clusterName)
-
-    # Get list of container instance IDs from the clusterName
-    clusterListResp = ecsClient.list_container_instances(cluster=clusterName)
-    logger.debug("list container instances response %s",clusterListResp)
 
     # If the event received is instance terminating...
     if 'LifecycleTransition' in message.keys():
